@@ -1,4 +1,4 @@
-# Leghe Fantacalcio Client
+# Fantasy Football Client
 
 A NodeJs client to interact with https://leghe.fantacalcio.it/
 

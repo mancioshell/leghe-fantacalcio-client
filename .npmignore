@@ -6,3 +6,4 @@ conf
 tsconfig.json
 examples
 /lib
+.husky
