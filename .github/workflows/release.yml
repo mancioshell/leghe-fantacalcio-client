@@ -1,48 +1,73 @@
-name: Create a Github Release
-on:
-  push:
-    # Pattern matched against refs/tags
-    tags:        
-      - '*'
+name: Create New Release
+on: workflow_dispatch
 
 jobs:
-  extract-tag:
+  standard-version:
+    name: "Run standard-version"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: 'Get Current Tag'
-        id: current_tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - uses: jungwinter/split@v1
-        id: split
+      - name: Configure committer
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+      - name: Bump version
+        uses: qzb/standard-version-action@v1.0.5
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
         with:
-          msg: ${{ steps.current_tag.outputs.tag }}
-          seperator: v
-    outputs:
-      tag: ${{ steps.split.outputs._1 }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
 
   create-release:
-    needs: extract-tag
-    name: Create Windows Release
+    needs: standard-version
+    name: "Create Github Release"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 16
-      - run: yarn build
-      - run: yarn pack
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      # - name: Extract release notes
-      #   id: extract-release-notes
-      #   uses: ffurrer2/extract-release-notes@v1
+      - name: "Build & test"
+        run: yarn build
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: "Create Release"
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ steps.previoustag.outputs.tag }}
+          prerelease: false
           files: |
-            leghe-fantacalcio-client-${{ steps.current_tag.outputs.tag }}.tgz          
-          #body: ${{ steps.extract-release-notes.outputs.release_notes }}
+            LICENSE
+            CHANGELOG.md
+            dist
+
+  # publish-npm:
+  #   needs: create-release
+  #   name: "Publish on NPM Registry"
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "16.x"
+  #         registry-url: "https://registry.npmjs.org"
+
+  #     - name: Install dependencies and build 🔧
+  #       run: yarn install && yarn build
+
+  #     - name: Publish package on NPM 📦
+  #       run: yarn publish
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
