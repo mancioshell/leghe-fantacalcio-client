@@ -1,0 +1,48 @@
+name: Create a Github Release
+on:
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - '*'
+
+jobs:
+  extract-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: 'Get Current Tag'
+        id: current_tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - uses: jungwinter/split@v1
+        id: split
+        with:
+          msg: ${{ steps.current_tag.outputs.tag }}
+          seperator: v
+    outputs:
+      tag: ${{ steps.split.outputs._1 }}
+
+  create-release:
+    needs: extract-tag
+    name: Create Windows Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - run: yarn build
+      - run: yarn pack
+
+      # - name: Extract release notes
+      #   id: extract-release-notes
+      #   uses: ffurrer2/extract-release-notes@v1
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            leghe-fantacalcio-client-${{ steps.current_tag.outputs.tag }}.tgz          
+          #body: ${{ steps.extract-release-notes.outputs.release_notes }}
