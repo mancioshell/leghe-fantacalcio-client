@@ -1,6 +1,6 @@
 {
   "name": "fantasy-football-wrapper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A client to interact with fantacalcio.it REST Api",
   "author": "Alessandro Mancini <dott.alessandro.mancini@gmail.com>",
   "license": "ISC",
@@ -36,7 +36,7 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    }    
+    }
   },
   "commitlint": {
     "extends": [
