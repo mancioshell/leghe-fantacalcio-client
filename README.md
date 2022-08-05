@@ -2,6 +2,12 @@
 
 A NodeJs client to interact with https://leghe.fantacalcio.it/
 
+## Installation
+
+```
+npm i fantasy-football-wrapper
+```
+
 ## Configuration
 
 Create a file credentials.json in a conf directory.
