@@ -22,8 +22,151 @@ Create a file credentials.json in a conf directory.
 
 ```
 
-## Usage
+## Examples
 
+### Get your leagues
+
+```js
+
+const FantasyFootballClient = require("fantasy-football-wrapper").default;
+const conf = require("./conf/config.json");
+
+const main = async () => {
+    
+  const client = new FantasyFootballClient(
+    conf.appkey,
+    conf.webkey,
+    conf.username,
+    conf.password
+  );
+
+  await client.login();
+
+  let leagues = await client.getLeagues();
+  console.log(leagues);
+
+};
+
+main()
 ```
-yarn start
+
+### Get Released Player List
+
+```js
+
+const FantasyFootballClient = require("fantasy-football-wrapper").default;
+const conf = require("./conf/config.json");
+
+const main = async () => {
+    
+  const client = new FantasyFootballClient(
+    conf.appkey,
+    conf.webkey,
+    conf.username,
+    conf.password
+  );
+
+  await client.login();
+
+  let leagues = await client.getLeagues();
+
+  await client.setCurrentLeague(leagues[0]._id)
+
+  let playerList = await client.getReleasedList()  
+  console.log(playerList)
+
+};
+
+main()
+```
+
+### Get League's Teams
+
+```js
+
+const FantasyFootballClient = require("fantasy-football-wrapper").default;
+const conf = require("./conf/config.json");
+
+const main = async () => {
+    
+  const client = new FantasyFootballClient(
+    conf.appkey,
+    conf.webkey,
+    conf.username,
+    conf.password
+  );
+
+  await client.login();
+
+  let leagues = await client.getLeagues();
+
+  await client.setCurrentLeague(leagues[0]._id)
+
+  let teams = await client.getTeams()
+  console.log(teams)
+
+};
+
+main()
+```
+
+
+### Buy a Player
+
+```js
+
+const FantasyFootballClient = require("fantasy-football-wrapper").default;
+const conf = require("./conf/config.json");
+
+const main = async () => {
+    
+  const client = new FantasyFootballClient(
+    conf.appkey,
+    conf.webkey,
+    conf.username,
+    conf.password
+  );
+
+  await client.login();
+
+  let leagues = await client.getLeagues();
+
+  await client.setCurrentLeague(leagues[0]._id)
+
+  let result = await client.buyPlayer(335, 1202003, 20)
+  console.log(result)
+
+};
+
+main()
+```
+
+### Release a Player
+
+```js
+
+const FantasyFootballClient = require("fantasy-football-wrapper").default;
+const conf = require("./conf/config.json");
+
+const main = async () => {
+    
+  const client = new FantasyFootballClient(
+    conf.appkey,
+    conf.webkey,
+    conf.username,
+    conf.password
+  );
+
+  await client.login();
+
+  let leagues = await client.getLeagues();
+
+  await client.setCurrentLeague(leagues[0]._id)
+
+  let result = await client.releasePlayer(335, 1202003, 20)
+  console.log(result)
+
+};
+
+main()
 ```
