@@ -2,27 +2,25 @@ class Player {
   private _id: number;
   private _name: string;
   private _team: string;
-  private _mantra_role: string;
   private _role: string;
-  private _quotation: number;
-  private _mantra_quotation: number;
+  private _initial_quotation: number;
+  private _current_quotation: number;
+  private _price: number | undefined;
 
   constructor(
-    _id: number,
-    _name: string,
-    _team: string,
-    _mantra_role: string,
-    _role: string,
-    _quotation: number,
-    _mantra_quotation: number
+    _id: number = 0,
+    _name: string = "",
+    _team: string = "",
+    _role: string = "",
+    _initial_quotation: number = 0,
+    _current_quotation: number = 0
   ) {
     this._id = _id;
     this._name = _name;
-    this._team = _team;
-    this._mantra_role = _mantra_role;
+    this._team = _team;    
     this._role = _role;
-    this._quotation = _quotation;
-    this._mantra_quotation = _mantra_quotation;
+    this._initial_quotation = _initial_quotation;
+    this._current_quotation = _current_quotation;
   }
 
   public get id() {
@@ -33,24 +31,28 @@ class Player {
     return this._name;
   }
 
-  public get mantraRole() {
-    return this._mantra_role;
-  }
-
   public get role() {
     return this._role;
   }
 
   public get team() {
     return this._team;
+  } 
+
+  public get initialQuotation() {
+    return this._initial_quotation;
   }
 
-  public get mantra_quotation() {
-    return this._mantra_quotation;
+  public get currentQuotation() {
+    return this._current_quotation;
   }
 
-  public get quotation() {
-    return this._quotation;
+  public get price() {
+    return this._price;
+  }
+
+  public set price(price: number | undefined) {
+    this._price = price
   }
 }
 
