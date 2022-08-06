@@ -7,13 +7,14 @@ class League {
   private _token: string;
   private _alias: string;
   private _teams: Array<Team> = new Array();
-  private _releasedPlayerList: Array<Player> = new Array();
+  private _players: Map<number, Player>;
 
   constructor(_id: number, _name: string, _alias: string , _token: string) {
     this._id = _id;
     this._name = _name;
     this._alias = _alias;
     this._token = _token;
+    this._players = new Map<number, Player>();
   }
 
   public get id() {
@@ -34,18 +35,26 @@ class League {
 
   public get teams() {
     return this._teams;
-  }
-
-  public get releasedPlayerList() {
-    return this._releasedPlayerList;
-  }
+  }  
 
   public set teams(teams: Array<Team>) {
     this._teams = teams;
   }
 
-  public set releasedPlayerList(playerList: Array<Player>) {
-    this._releasedPlayerList = playerList;
+  public get players() {
+    return this._players;
+  }
+
+  public set players(players: Map<number, Player>) {
+    this._players = players;
+  }
+
+  public addPlayer(player: Player) {
+    this._players.set(player.id, player);
+  }
+
+  public removePlayers(player: Player) {
+    this._players.delete(player.id);
   }
 }
 
