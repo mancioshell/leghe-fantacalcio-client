@@ -127,10 +127,10 @@ class FantasyFootball {
     this._currentLeague!.players = players;
   }
 
-  private async _retreiveLeageUsers() {
+  private async _retreiveUserInfo() {
     let res = await this._httpClient.execute(
       "GET",
-      `${APP_BASE_URL}/api/v1/V2_Lega/invitiAccettati`,
+      `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
       {
         app_key: this._appKey,
         user_token: this._token,
@@ -139,6 +139,7 @@ class FantasyFootball {
     );
 
     let data = JSON.parse(res.raw_body).data;
+    
     let currentUser = data.find(
       (elem: any) => elem.username === this._currentUser?.username
     );
@@ -171,8 +172,7 @@ class FantasyFootball {
       data.utente.email
     );
 
-    this._currentUser = user;
-    this._retreiveLeageUsers()
+    this._currentUser = user;    
 
     data.leghe.forEach((element: any) => {
       this._leagues.push(
@@ -196,6 +196,7 @@ class FantasyFootball {
     if (index < 0) throw new Error(`no league with ${leagueId} id`);
     this._currentLeague = this._leagues[index];
 
+    await this._retreiveUserInfo()
     await this._webLogin();
     await this._retreivePlayers();
     await this._retrieveTeams();
