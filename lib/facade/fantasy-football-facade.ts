@@ -10,6 +10,7 @@ import {
   Actions,
 } from "./decorators";
 import HttpClient from "./http-client";
+import User from "../models/user";
 
 const APP_BASE_URL = "https://appleghe.fantacalcio.it/api";
 const WEB_BASE_URL = "https://leghe.fantacalcio.it";
@@ -24,6 +25,7 @@ class FantasyFootball {
   private _leagues: Array<League> = new Array();
   private _token: string | undefined;
   private _currentLeague: League | undefined;
+  private _currentUser: User | undefined;
 
   private _httpClient: HttpClient;
   private _firstLogin: boolean;
@@ -125,6 +127,26 @@ class FantasyFootball {
     this._currentLeague!.players = players;
   }
 
+  private async _retreiveLeageUsers() {
+    let res = await this._httpClient.execute(
+      "GET",
+      `${APP_BASE_URL}/api/v1/V2_Lega/invitiAccettati`,
+      {
+        app_key: this._appKey,
+        user_token: this._token,
+        lega_token: this._currentLeague?.token,
+      }
+    );
+
+    let data = JSON.parse(res.raw_body).data;
+    let currentUser = data.find(
+      (elem: any) => elem.username === this._currentUser?.username
+    );
+
+    this._currentUser!.superAdmin = currentUser.admin
+    this._currentUser!.admin = currentUser.adminSecondario    
+  }
+
   @RefreshAuth()
   public async login() {
     let res = await this._httpClient.execute(
@@ -143,11 +165,22 @@ class FantasyFootball {
     let data = JSON.parse(res.raw_body).data;
     this._token = data.utente.utente_token;
 
+    let user = new User(
+      data.utente.id,
+      data.utente.username,
+      data.utente.email
+    );
+
+    this._currentUser = user;
+    this._retreiveLeageUsers()
+
     data.leghe.forEach((element: any) => {
       this._leagues.push(
         new League(element.id, element.nome, element.alias, element.token)
       );
     });
+
+    return this._currentUser
   }
 
   @Authenticated()
@@ -169,13 +202,13 @@ class FantasyFootball {
   }
 
   @LeagueSelected()
-  @Authenticated()  
+  @Authenticated()
   public async getPlayerList() {
     return this._currentLeague!.players;
   }
 
-  @LeagueSelected() 
-  @Authenticated()  
+  @LeagueSelected()
+  @Authenticated()
   public async getTeams() {
     return this._currentLeague!.teams;
   }
@@ -198,7 +231,7 @@ class FantasyFootball {
         "Content-Type": "application/json",
       },
       { id_squadra: teamId, ids: playerId, costi: price }
-    );   
+    );
 
     this._currentLeague?.players.delete(playerId);
     player.price = price;
@@ -209,7 +242,6 @@ class FantasyFootball {
     return data;
   }
 
-  
   @RetrieveTeamAndPlayer(Actions.Release)
   @LeagueSelected()
   @Authenticated()
