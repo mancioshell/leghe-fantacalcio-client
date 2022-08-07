@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.1](https://github.com/mancioshell/fantasy-football-client/compare/v1.2.0...v1.2.1) (2022-08-07)
+
+
+### Bug Fixes
+
+* removed index.ts from gitignore ([d3d668b](https://github.com/mancioshell/fantasy-football-client/commit/d3d668ba47fa65ec01eec59f61537d987c7eed3e))
+
 ## [1.2.0](https://github.com/mancioshell/fantasy-football-client/compare/v1.1.0...v1.2.0) (2022-08-06)
 
 
