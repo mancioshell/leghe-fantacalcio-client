@@ -1,14 +1,7 @@
-import League from "../models/league";
+import League, { Role } from "../models/league";
 import Team from "../models/team";
 import Player from "../models/player";
 
-import {
-  Authenticated,
-  LeagueSelected,
-  RefreshAuth,
-  RetrieveTeamAndPlayer,
-  Actions,
-} from "./decorators";
 import HttpClient from "./http-client";
 import User from "../models/user";
 
@@ -18,55 +11,38 @@ const WEB_BASE_URL = "https://leghe.fantacalcio.it";
 class FantasyFootball {
   private _appKey: string;
   private _webAppKey: string;
-  private _username: string;
-  private _password: string;
-  private _refreshInterval: number;
-
-  private _leagues: Array<League> = new Array();
-  private _token: string | undefined;
-  private _currentLeague: League | undefined;
-  private _currentUser: User | undefined;
-
   private _httpClient: HttpClient;
-  private _firstLogin: boolean;
 
-  constructor(
-    appKey: string,
-    webAppKey: string,
-    username: string,
-    password: string,
-    refreshInterval: number = -1
-  ) {
+  constructor(appKey: string, webAppKey: string) {
     this._appKey = appKey;
     this._webAppKey = webAppKey;
-    this._username = username;
-    this._password = password;
-    this._refreshInterval = refreshInterval;
-
     this._httpClient = new HttpClient();
-    this._firstLogin = false;
   }
 
-  private async _webLogin() {
+  private async _webLogin(userToken: string, leagueToken: string) {
     await this._httpClient.execute(
       "GET",
       `${WEB_BASE_URL}/api/v1/v1_Utente/login?s=8`,
       {
         app_key: this._appKey,
-        user_token: this._token,
-        lega_token: this._currentLeague!.token,
+        user_token: userToken,
+        lega_token: leagueToken,
       }
     );
   }
 
-  private async _retrieveTeams() {
+  private async _retrieveTeams(
+    userToken: string,
+    leagueToken: string,
+    players: Map<number, Player>
+  ) {
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/v1_lega/squadre`,
       {
         app_key: this._appKey,
-        user_token: this._token,
-        lega_token: this._currentLeague?.token,
+        user_token: userToken,
+        lega_token: leagueToken,
       }
     );
 
@@ -80,30 +56,34 @@ class FantasyFootball {
       let team = new Team(element.id, element.idu, element.n);
 
       idPlayerList.forEach((id: string, index: number) => {
-        let player = this._currentLeague!.players.get(parseInt(id));
+        let player = players.get(parseInt(id));
 
         if (player) {
           team.addPlayer(player);
           player.price = priceList[index];
         }
-
-        this._currentLeague!.players.delete(parseInt(id));
       });
 
       teams.push(team);
     });
 
-    this._currentLeague!.teams = teams;
+    return teams;
   }
 
-  private async _retreivePlayers() {
+  private async _retreivePlayers(
+    userToken: string,
+    leagueToken: string,
+    aliasLeague: string
+  ): Promise<Map<number, Player>> {
+    await this._webLogin(userToken, leagueToken);
+
     let res = await this._httpClient.execute(
       "GET",
-      `${WEB_BASE_URL}/servizi/v1_legheCalciatori/listaSvincolatiAdmin?alias_lega=${this._currentLeague?.alias}&id_mercato=0&tipo_mercato=4`,
+      `${WEB_BASE_URL}/servizi/v1_legheCalciatori/listaSvincolatiAdmin?alias_lega=${aliasLeague}&id_mercato=0&tipo_mercato=4`,
       {
         app_key: this._webAppKey,
-        user_token: this._token,
-        lega_token: this._currentLeague?.token,
+        user_token: userToken,
+        lega_token: leagueToken,
       }
     );
 
@@ -124,32 +104,38 @@ class FantasyFootball {
       );
     });
 
-    this._currentLeague!.players = players;
+    return players;
   }
 
-  private async _retreiveUserInfo() {
+  private async _retreiveUserRoles(
+    userToken: string,
+    leagueToken: string,
+    username: string
+  ) {
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
       {
         app_key: this._appKey,
-        user_token: this._token,
-        lega_token: this._currentLeague?.token,
+        user_token: userToken,
+        lega_token: leagueToken,
       }
     );
 
     let data = JSON.parse(res.raw_body).data;
-    
-    let currentUser = data.find(
-      (elem: any) => elem.username === this._currentUser?.username
-    );
 
-    this._currentUser!.superAdmin = currentUser.admin
-    this._currentUser!.admin = currentUser.adminSecondario    
+    let currentUser = data.find((elem: any) => elem.username === username);
+
+    let roles = new Array<Role>();
+    roles.push(Role.USER);
+
+    if (currentUser.adminSecondario) roles.push(Role.ADMIN);
+    if (currentUser.admin) roles.push(Role.SUPER_ADMIN);
+
+    return roles;
   }
 
-  @RefreshAuth()
-  public async login() {
+  public async login(username: string, password: string) {
     let res = await this._httpClient.execute(
       "POST",
       `${APP_BASE_URL}/v1/v1_utente/login`,
@@ -158,75 +144,76 @@ class FantasyFootball {
         "Content-Type": "application/json",
       },
       {
-        username: this._username,
-        password: this._password,
+        username: username,
+        password: password,
       }
     );
 
     let data = JSON.parse(res.raw_body).data;
-    this._token = data.utente.utente_token;
 
-    let user = new User(
-      data.utente.id,
-      data.utente.username,
-      data.utente.email
-    );
-
-    this._currentUser = user;    
+    let leagues = new Array<League>();
 
     data.leghe.forEach((element: any) => {
-      this._leagues.push(
+      leagues.push(
         new League(element.id, element.nome, element.alias, element.token)
       );
     });
 
-    return this._currentUser
-  }
+    for (const league of leagues) {
+      let roles = await this._retreiveUserRoles(
+        data.utente.utente_token,
+        league.token,
+        data.utente.username
+      );
+      league.roles = roles;
+    }
 
-  @Authenticated()
-  public async getLeagues() {
-    return this._leagues;
-  }
-
-  @Authenticated()
-  public async setCurrentLeague(leagueId: number) {
-    let index = this._leagues.findIndex(
-      (league: League) => league.id === leagueId
+    let user = new User(
+      data.utente.id,
+      data.utente.username,
+      data.utente.email,
+      data.utente.utente_token,
+      leagues
     );
-    if (index < 0) throw new Error(`no league with ${leagueId} id`);
-    this._currentLeague = this._leagues[index];
 
-    await this._retreiveUserInfo()
-    await this._webLogin();
-    await this._retreivePlayers();
-    await this._retrieveTeams();
+    return user;
   }
 
-  @LeagueSelected()
-  @Authenticated()
-  public async getPlayerList() {
-    return this._currentLeague!.players;
+  public async getPlayerList(
+    userToken: string,
+    leagueToken: string,
+    aliasLeague: string
+  ) {
+    return this._retreivePlayers(userToken, leagueToken, aliasLeague);
   }
 
-  @LeagueSelected()
-  @Authenticated()
-  public async getTeams() {
-    return this._currentLeague!.teams;
+  public async getTeams(
+    userToken: string,
+    leagueToken: string,
+    aliasLeague: string
+  ) {
+    let players = await this._retreivePlayers(
+      userToken,
+      leagueToken,
+      aliasLeague
+    );
+    return this._retrieveTeams(userToken, leagueToken, players);
   }
 
-  @RetrieveTeamAndPlayer(Actions.Buy)
-  @LeagueSelected()
-  @Authenticated()
-  public async buyPlayer(
+  public async buyPlayer(   
+    userToken: string,
+    leagueToken: string,
+    leagueAlias: string,
     playerId: number,
     teamId: number,
-    price: number,
-    team: Team = new Team(),
-    player: Player = new Player()
+    price: number
   ) {
+
+    await this._webLogin(userToken, leagueToken)
+
     let res = await this._httpClient.execute(
       "PUT",
-      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/salva?alias_lega=${this._currentLeague?.alias}`,
+      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/salva?alias_lega=${leagueAlias}`,
       {
         app_key: this._webAppKey,
         "Content-Type": "application/json",
@@ -234,28 +221,25 @@ class FantasyFootball {
       { id_squadra: teamId, ids: playerId, costi: price }
     );
 
-    this._currentLeague?.players.delete(playerId);
-    player.price = price;
-    team.addPlayer(player);
-
     let data = JSON.parse(res.raw_body);
 
     return data;
   }
 
-  @RetrieveTeamAndPlayer(Actions.Release)
-  @LeagueSelected()
-  @Authenticated()
-  public async releasePlayer(
+  public async releasePlayer(    
+    userToken: string,
+    leagueToken: string,
+    leagueAlias: string,
     playerId: number,
     teamId: number,
-    releasePrice: number,
-    team: Team = new Team(),
-    player: Player = new Player()
+    releasePrice: number
   ) {
+
+    await this._webLogin(userToken, leagueToken)
+
     let res = await this._httpClient.execute(
       "DELETE",
-      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/svincola?alias_lega=${this._currentLeague?.alias}`,
+      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/svincola?alias_lega=${leagueAlias}`,
       {
         app_key: this._webAppKey,
         "Content-Type": "application/json",
@@ -264,10 +248,6 @@ class FantasyFootball {
     );
 
     let data = JSON.parse(res.raw_body);
-
-    player.price = undefined;
-    team.removePlayer(player);
-    team.addPlayer(player);
 
     return data;
   }

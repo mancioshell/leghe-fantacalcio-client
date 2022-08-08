@@ -36,15 +36,11 @@ const main = async () => {
     
   const client = new FantasyFootballClient(
     conf.appkey,
-    conf.webkey,
-    conf.username,
-    conf.password
+    conf.webkey    
   );
 
-  await client.login();
-
-  let leagues = await client.getLeagues();
-  console.log(leagues);
+  let user = await client.login(conf.username, conf.password);
+  console.log(user.leagues);
 
 };
 
@@ -62,18 +58,16 @@ const main = async () => {
     
   const client = new FantasyFootballClient(
     conf.appkey,
-    conf.webkey,
-    conf.username,
-    conf.password
+    conf.webkey    
   );
 
-  await client.login();
+  let user = await client.login(conf.username, conf.password);
+  
+  let userToken = user.token
+  let leagueToken = user.leagues[0].token
+  let leagueAlias = user.leagues[0].alias
 
-  let leagues = await client.getLeagues();
-
-  await client.setCurrentLeague(leagues[0]._id)
-
-  let playerList = await client.getReleasedList()  
+  let playerList = await client.getPlayerList(userToken, leagueToken, leagueAlias)
   console.log(playerList)
 
 };
@@ -92,19 +86,19 @@ const main = async () => {
     
   const client = new FantasyFootballClient(
     conf.appkey,
-    conf.webkey,
-    conf.username,
-    conf.password
+    conf.webkey    
   );
 
-  await client.login();
+  let user = await client.login(conf.username, conf.password);
+  
+  let userToken = user.token
+  let leagueToken = user.leagues[0].token
+  let leagueAlias = user.leagues[0].alias
 
-  let leagues = await client.getLeagues();
-
-  await client.setCurrentLeague(leagues[0]._id)
-
-  let teams = await client.getTeams()
-  console.log(teams)
+  let teams = await client.getTeams(userToken, leagueToken, leagueAlias);
+  console.log(
+    util.inspect(teams, { showHidden: false, depth: null, colors: true })
+  );
 
 };
 
@@ -123,18 +117,16 @@ const main = async () => {
     
   const client = new FantasyFootballClient(
     conf.appkey,
-    conf.webkey,
-    conf.username,
-    conf.password
+    conf.webkey    
   );
 
-  await client.login();
+  let user = await client.login(conf.username, conf.password);
+  
+  let userToken = user.token
+  let leagueToken = user.leagues[0].token
+  let leagueAlias = user.leagues[0].alias
 
-  let leagues = await client.getLeagues();
-
-  await client.setCurrentLeague(leagues[0]._id)
-
-  let result = await client.buyPlayer(335, 1202003, 20)
+  let result = await client.buyPlayer(userToken, leagueToken, leagueAlias, 335, 1202003, 20)
   console.log(result)
 
 };
@@ -153,18 +145,16 @@ const main = async () => {
     
   const client = new FantasyFootballClient(
     conf.appkey,
-    conf.webkey,
-    conf.username,
-    conf.password
+    conf.webkey    
   );
 
-  await client.login();
+  let user = await client.login(conf.username, conf.password);
+  
+  let userToken = user.token
+  let leagueToken = user.leagues[0].token
+  let leagueAlias = user.leagues[0].alias
 
-  let leagues = await client.getLeagues();
-
-  await client.setCurrentLeague(leagues[0]._id)
-
-  let result = await client.releasePlayer(335, 1202003, 20)
+  let result = await client.releasePlayer(userToken, leagueToken, leagueAlias, 335, 1202003, 20)
   console.log(result)
 
 };

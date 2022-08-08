@@ -1,6 +1,12 @@
 import Player from "./player";
 import Team from "./team";
 
+enum Role {
+  ADMIN,
+  SUPER_ADMIN,
+  USER
+}
+
 class League {
   private _id: number;
   private _name: string;
@@ -8,6 +14,7 @@ class League {
   private _alias: string;
   private _teams: Array<Team> = new Array();
   private _players: Map<number, Player>;
+  private _roles: Array<Role> = new Array<Role>();
 
   constructor(_id: number, _name: string, _alias: string , _token: string) {
     this._id = _id;
@@ -49,6 +56,18 @@ class League {
     this._players = players;
   }
 
+  public get roles() {
+    return this._roles;
+  } 
+
+  public set roles(roles: Array<Role>) {
+    this._roles = roles;
+  }
+
+  public addRole(role: Role) {
+    this._roles.push(role);
+  }
+
   public addPlayer(player: Player) {
     this._players.set(player.id, player);
   }
@@ -59,3 +78,4 @@ class League {
 }
 
 export default League;
+export {Role, League}
