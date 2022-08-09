@@ -1,6 +1,6 @@
 {
   "name": "fantasy-football-wrapper",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A client to interact with fantacalcio.it REST Api",
   "author": "Alessandro Mancini <dott.alessandro.mancini@gmail.com>",
   "license": "ISC",
