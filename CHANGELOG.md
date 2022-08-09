@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/mancioshell/fantasy-football-client/compare/v1.5.3...v1.6.0) (2022-08-09)
+
+
+### Features
+
+* added get league options ([5a04930](https://github.com/mancioshell/fantasy-football-client/commit/5a049304732bf5f0f19ab419582eeda3aa42de0d))
+
 ## [1.5.3](https://github.com/mancioshell/fantasy-football-client/compare/v1.5.2...v1.5.3) (2022-08-09)
 
 
