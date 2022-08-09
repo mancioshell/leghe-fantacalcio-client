@@ -77,6 +77,10 @@ class League {
     this._players.delete(player.id);
   }
 
+  public serialize(){
+    return this.toJSON()
+  }
+
   public toJSON(){
     return {
       id: this._id,
