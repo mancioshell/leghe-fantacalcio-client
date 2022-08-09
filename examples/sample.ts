@@ -9,13 +9,13 @@ const main = async () => {
   );
 
   let user = await client.login(conf.username, conf.password)
-  console.log(user.serialize())
+  console.log(JSON.parse(JSON.stringify(user)))
 
-  // let leagues = await client.getLeagues(user.token)
-  // console.log(JSON.parse(JSON.stringify(leagues)))
+  let leagues = await client.getLeagues(user.token)
+  console.log(JSON.parse(JSON.stringify(leagues)))
 
-  // let league = await client.getLeague(user.token, leagues[0].id)
-  // console.log(JSON.parse(JSON.stringify(league)))
+  let league = await client.getLeague(user.token, leagues[0].id)
+  console.log(JSON.parse(JSON.stringify(league)))
 
   // let roles = await client.getRolesByLeague(user.token, leagues[0].id)
   // console.log(JSON.parse(JSON.stringify(roles)))

@@ -7,6 +7,31 @@ enum Role {
   USER = "USER",
 }
 
+class LeagueOptions {
+  private _credits: number;
+  private _min_players: number;
+  private _max_players: number;
+
+  private _goalkeeper: number;
+
+  constructor(_credits: number, _min_players: number, _max_players: number, _goalkeeper: number) {
+    this._credits = _credits;
+    this._min_players = _min_players;
+    this._max_players = _max_players;
+    this._goalkeeper = _goalkeeper;
+  }
+
+  public toJSON(){
+    return {
+      credits: this._credits,
+      min_players: this._min_players,
+      max_players: this._max_players,
+      goalkeeper: this._goalkeeper
+    }
+  }
+
+}
+
 class League {
   private _id: number;
   private _name: string;
@@ -16,6 +41,8 @@ class League {
 
   private _teams: Array<Team> = new Array();
   private _players: Map<number, Player>;
+
+  private _options: LeagueOptions = new LeagueOptions(0, 0, 0, 0)
 
   constructor(_id: number, _name: string, _alias: string, _token: string) {
     this._id = _id;
@@ -39,6 +66,14 @@ class League {
 
   public get token() {
     return this._token;
+  }
+
+  public get options() {
+    return this._options;
+  }
+
+  public set options(options: LeagueOptions) {
+    this._options = options;
   }
 
   public get teams() {
@@ -76,18 +111,15 @@ class League {
   public removePlayers(player: Player) {
     this._players.delete(player.id);
   }
-
-  public serialize(){
-    return this.toJSON()
-  }
-
+  
   public toJSON(){
     return {
       id: this._id,
-      username: this._name,
+      name: this._name,
       token: this._token,
       alias: this._alias,
       roles: this._roles,
+      options: this._options,
       teams: this._teams,
       players: Object.fromEntries(this.players)
     }
@@ -95,4 +127,4 @@ class League {
 }
 
 export default League;
-export { Role, League };
+export { Role, LeagueOptions, League };

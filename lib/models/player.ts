@@ -55,10 +55,6 @@ class Player {
     this._price = price
   }
 
-  public serialize(){
-    return this.toJSON()
-  }
-
   public toJSON(){
     return {
       id: this._id,
@@ -66,7 +62,7 @@ class Player {
       team: this._team,
       role: this._role,
       initial_quotation: this._initial_quotation,
-      _current_quotation: this._current_quotation
+      current_quotation: this._current_quotation
     }
   }
 }

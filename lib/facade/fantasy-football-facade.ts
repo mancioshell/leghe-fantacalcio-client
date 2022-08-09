@@ -1,4 +1,4 @@
-import League, { Role } from "../models/league";
+import League, { LeagueOptions, Role } from "../models/league";
 import Team, { TeamPackage } from "../models/team";
 import Player from "../models/player";
 
@@ -19,7 +19,10 @@ class FantasyFootball {
     this._httpClient = new HttpClient();
   }
 
-  private async _webLogin(userToken: string, leagueToken: string): Promise<void> {
+  private async _webLogin(
+    userToken: string,
+    leagueToken: string
+  ): Promise<void> {
     await this._httpClient.execute(
       "GET",
       `${WEB_BASE_URL}/api/v1/v1_Utente/login?s=8`,
@@ -44,7 +47,10 @@ class FantasyFootball {
     return data;
   }
 
-  private async _retrieveTeams(userToken: string, leagueToken: string) : Promise<Array<TeamPackage>> {
+  private async _retrieveTeams(
+    userToken: string,
+    leagueToken: string
+  ): Promise<Array<TeamPackage>> {
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/v1_lega/squadre`,
@@ -70,7 +76,7 @@ class FantasyFootball {
     return teams;
   }
 
-  private async _retreivePlayers(
+  private async _retrievePlayers(
     userToken: string,
     leagueToken: string,
     aliasLeague: string
@@ -107,7 +113,34 @@ class FantasyFootball {
     return players;
   }
 
-  private async _retreiveUserRoles(
+  private async _retrieveLeagueOptions(
+    userToken: string,
+    leagueToken: string
+  ): Promise<LeagueOptions> {
+    let res = await this._httpClient.execute(
+      "GET",
+      `${APP_BASE_URL}/v1/v1_lega/opzioni`,
+      {
+        app_key: this._appKey,
+        user_token: userToken,
+        lega_token: leagueToken,
+      }
+    );
+
+    let data = JSON.parse(res.raw_body).data;
+    let leagueOptions = data.opzioni_rose;
+
+    let options = new LeagueOptions(
+      leagueOptions.crediti,
+      leagueOptions.min_rosa,
+      leagueOptions.max_rosa,
+      leagueOptions.calciatori_ruolo.p
+    );
+
+    return options;
+  }
+
+  private async _retrieveUserRoles(
     userToken: string,
     leagueToken: string,
     username: string
@@ -135,7 +168,7 @@ class FantasyFootball {
     return roles;
   }
 
-  public async login(username: string, password: string) : Promise<User> {
+  public async login(username: string, password: string): Promise<User> {
     let res = await this._httpClient.execute(
       "POST",
       `${APP_BASE_URL}/v1/v1_utente/login`,
@@ -161,7 +194,7 @@ class FantasyFootball {
     return user;
   }
 
-  public async getLeagues(userToken: string) : Promise<Array<League>>{
+  public async getLeagues(userToken: string): Promise<Array<League>> {
     let profile = await this._retrieveProfile(userToken);
 
     let leagues = new Array<League>();
@@ -179,14 +212,17 @@ class FantasyFootball {
     return leagues;
   }
 
-  public async getRolesByLeague(userToken: string, leagueId: number): Promise<Array<Role>> {
+  public async getRolesByLeague(
+    userToken: string,
+    leagueId: number
+  ): Promise<Array<Role>> {
     let profile = await this._retrieveProfile(userToken);
 
     let leagueToken = profile.leghe.find(
       (league: any) => league.id === leagueId
     )?.token;
 
-    let roles = await this._retreiveUserRoles(
+    let roles = await this._retrieveUserRoles(
       userToken,
       leagueToken,
       profile.utente.username
@@ -195,7 +231,7 @@ class FantasyFootball {
     return roles;
   }
 
-  public async getLeague(userToken: string, leagueId: number) : Promise<League> {
+  public async getLeague(userToken: string, leagueId: number): Promise<League> {
     let profile = await this._retrieveProfile(userToken);
 
     let currentLeague = profile.leghe.find(
@@ -208,17 +244,18 @@ class FantasyFootball {
       currentLeague.token
     );
 
-    let players = await this._retreivePlayers(
+    let options = await this._retrieveLeagueOptions(userToken, league.token)
+
+    let players = await this._retrievePlayers(
       userToken,
       league.token,
       league.alias
     );
 
     let packages = await this._retrieveTeams(userToken, league.token);
-    let teams = new Array<Team>()
+    let teams = new Array<Team>();
 
     packages.forEach((element: TeamPackage) => {
-
       element.ids.forEach((id: string, index: number) => {
         let player = players.get(parseInt(id));
         if (player) {
@@ -229,11 +266,12 @@ class FantasyFootball {
         }
       });
 
-      teams.push(element.team)
+      teams.push(element.team);
     });
 
     league.players = players;
     league.teams = teams;
+    league.options = options
 
     return league;
   }
@@ -245,7 +283,6 @@ class FantasyFootball {
     teamId: number,
     price: number
   ) {
-
     let profile = await this._retrieveProfile(userToken);
     let currentLeague = profile.leghe.find(
       (league: any) => league.id === leagueId
@@ -275,7 +312,6 @@ class FantasyFootball {
     teamId: number,
     releasePrice: number
   ) {
-
     let profile = await this._retrieveProfile(userToken);
     let currentLeague = profile.leghe.find(
       (league: any) => league.id === leagueId

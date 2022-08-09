@@ -32,10 +32,6 @@ class User {
   public get token() {
     return this._token;
   }
-
-  public serialize(){
-    return this.toJSON()
-  }
   
   public toJSON(){
     return {

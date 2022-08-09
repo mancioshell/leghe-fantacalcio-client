@@ -40,16 +40,12 @@ class Team {
     this._players.delete(player.id);
   }
 
-  public serialize(){
-    return this.toJSON()
-  }
-
   public toJSON(){
     return {
       id: this._id,
       userId: this._userId,
       name: this._name,
-      players: this._players
+      players: Object.fromEntries(this.players)
     }
   }
 }
