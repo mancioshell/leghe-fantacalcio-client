@@ -54,6 +54,21 @@ class Player {
   public set price(price: number | undefined) {
     this._price = price
   }
+
+  public serialize(){
+    return this.toJSON()
+  }
+
+  public toJSON(){
+    return {
+      id: this._id,
+      name: this._name,
+      team: this._team,
+      role: this._role,
+      initial_quotation: this._initial_quotation,
+      _current_quotation: this._current_quotation
+    }
+  }
 }
 
 export default Player;

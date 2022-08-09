@@ -31,7 +31,20 @@ class User {
 
   public get token() {
     return this._token;
-  }  
+  }
+
+  public serialize(){
+    return this.toJSON()
+  }
+  
+  public toJSON(){
+    return {
+      id: this._id,
+      username: this._username,
+      email: this._email,
+      token: this._token
+    }
+  }
 }
 
 export default User;

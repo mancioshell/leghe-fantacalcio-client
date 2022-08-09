@@ -76,6 +76,18 @@ class League {
   public removePlayers(player: Player) {
     this._players.delete(player.id);
   }
+
+  public toJSON(){
+    return {
+      id: this._id,
+      username: this._name,
+      token: this._token,
+      alias: this._alias,
+      roles: this._roles,
+      teams: this._teams,
+      players: this._players
+    }
+  }
 }
 
 export default League;
