@@ -89,7 +89,7 @@ class League {
       alias: this._alias,
       roles: this._roles,
       teams: this._teams,
-      players: this._players
+      players: Object.fromEntries(this.players)
     }
   }
 }
