@@ -2,9 +2,9 @@ import Player from "./player";
 import Team from "./team";
 
 enum Role {
-  ADMIN,
-  SUPER_ADMIN,
-  USER
+  ADMIN = "ADMIN",
+  SUPER_ADMIN = "SUPER_ADMIN",
+  USER = "USER",
 }
 
 class League {
@@ -12,11 +12,12 @@ class League {
   private _name: string;
   private _token: string;
   private _alias: string;
-  private _teams: Array<Team> = new Array();
-  private _players: Map<number, Player>;
   private _roles: Array<Role> = new Array<Role>();
 
-  constructor(_id: number, _name: string, _alias: string , _token: string) {
+  private _teams: Array<Team> = new Array();
+  private _players: Map<number, Player>;
+
+  constructor(_id: number, _name: string, _alias: string, _token: string) {
     this._id = _id;
     this._name = _name;
     this._alias = _alias;
@@ -42,7 +43,7 @@ class League {
 
   public get teams() {
     return this._teams;
-  }  
+  }
 
   public set teams(teams: Array<Team>) {
     this._teams = teams;
@@ -58,7 +59,7 @@ class League {
 
   public get roles() {
     return this._roles;
-  } 
+  }
 
   public set roles(roles: Array<Role>) {
     this._roles = roles;
@@ -78,4 +79,4 @@ class League {
 }
 
 export default League;
-export {Role, League}
+export { Role, League };

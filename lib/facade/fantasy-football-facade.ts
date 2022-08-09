@@ -1,5 +1,5 @@
 import League, { Role } from "../models/league";
-import Team from "../models/team";
+import Team, { TeamPackage } from "../models/team";
 import Player from "../models/player";
 
 import HttpClient from "./http-client";
@@ -19,7 +19,7 @@ class FantasyFootball {
     this._httpClient = new HttpClient();
   }
 
-  private async _webLogin(userToken: string, leagueToken: string) {
+  private async _webLogin(userToken: string, leagueToken: string): Promise<void> {
     await this._httpClient.execute(
       "GET",
       `${WEB_BASE_URL}/api/v1/v1_Utente/login?s=8`,
@@ -31,11 +31,20 @@ class FantasyFootball {
     );
   }
 
-  private async _retrieveTeams(
-    userToken: string,
-    leagueToken: string,
-    players: Map<number, Player>
-  ) {
+  private async _retrieveProfile(userToken: string): Promise<any> {
+    let res = await this._httpClient.execute(
+      "GET",
+      `${APP_BASE_URL}/v1/v1_utente/profilo`,
+      {
+        app_key: this._appKey,
+        user_token: userToken,
+      }
+    );
+    let data = JSON.parse(res.raw_body).data;
+    return data;
+  }
+
+  private async _retrieveTeams(userToken: string, leagueToken: string) : Promise<Array<TeamPackage>> {
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/v1_lega/squadre`,
@@ -47,7 +56,7 @@ class FantasyFootball {
     );
 
     let data = JSON.parse(res.raw_body).data;
-    let teams = new Array<Team>();
+    let teams = new Array<TeamPackage>();
 
     data.forEach((element: any) => {
       let idPlayerList = element.cal.split(";");
@@ -55,16 +64,7 @@ class FantasyFootball {
 
       let team = new Team(element.id, element.idu, element.n);
 
-      idPlayerList.forEach((id: string, index: number) => {
-        let player = players.get(parseInt(id));
-
-        if (player) {
-          team.addPlayer(player);
-          player.price = priceList[index];
-        }
-      });
-
-      teams.push(team);
+      teams.push(new TeamPackage(idPlayerList, priceList, team));
     });
 
     return teams;
@@ -111,7 +111,7 @@ class FantasyFootball {
     userToken: string,
     leagueToken: string,
     username: string
-  ) {
+  ): Promise<Array<Role>> {
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
@@ -135,7 +135,7 @@ class FantasyFootball {
     return roles;
   }
 
-  public async login(username: string, password: string) {
+  public async login(username: string, password: string) : Promise<User> {
     let res = await this._httpClient.execute(
       "POST",
       `${APP_BASE_URL}/v1/v1_utente/login`,
@@ -151,69 +151,111 @@ class FantasyFootball {
 
     let data = JSON.parse(res.raw_body).data;
 
-    let leagues = new Array<League>();
-
-    data.leghe.forEach((element: any) => {
-      leagues.push(
-        new League(element.id, element.nome, element.alias, element.token)
-      );
-    });
-
-    for (const league of leagues) {
-      let roles = await this._retreiveUserRoles(
-        data.utente.utente_token,
-        league.token,
-        data.utente.username
-      );
-      league.roles = roles;
-    }
-
     let user = new User(
       data.utente.id,
       data.utente.username,
       data.utente.email,
-      data.utente.utente_token,
-      leagues
+      data.utente.utente_token
     );
 
     return user;
   }
 
-  public async getPlayerList(
-    userToken: string,
-    leagueToken: string,
-    aliasLeague: string
-  ) {
-    return this._retreivePlayers(userToken, leagueToken, aliasLeague);
+  public async getLeagues(userToken: string) : Promise<Array<League>>{
+    let profile = await this._retrieveProfile(userToken);
+
+    let leagues = new Array<League>();
+
+    profile.leghe.forEach((element: any) => {
+      let league = new League(
+        element.id,
+        element.nome,
+        element.alias,
+        element.token
+      );
+      leagues.push(league);
+    });
+
+    return leagues;
   }
 
-  public async getTeams(
-    userToken: string,
-    leagueToken: string,
-    aliasLeague: string
-  ) {
-    let players = await this._retreivePlayers(
+  public async getRolesByLeague(userToken: string, leagueId: number): Promise<Array<Role>> {
+    let profile = await this._retrieveProfile(userToken);
+
+    let leagueToken = profile.leghe.find(
+      (league: any) => league.id === leagueId
+    )?.token;
+
+    let roles = await this._retreiveUserRoles(
       userToken,
       leagueToken,
-      aliasLeague
+      profile.utente.username
     );
-    return this._retrieveTeams(userToken, leagueToken, players);
+
+    return roles;
   }
 
-  public async buyPlayer(   
+  public async getLeague(userToken: string, leagueId: number) : Promise<League> {
+    let profile = await this._retrieveProfile(userToken);
+
+    let currentLeague = profile.leghe.find(
+      (league: any) => league.id === leagueId
+    );
+    let league = new League(
+      currentLeague.id,
+      currentLeague.nome,
+      currentLeague.alias,
+      currentLeague.token
+    );
+
+    let players = await this._retreivePlayers(
+      userToken,
+      league.token,
+      league.alias
+    );
+
+    let packages = await this._retrieveTeams(userToken, league.token);
+    let teams = new Array<Team>()
+
+    packages.forEach((element: TeamPackage) => {
+
+      element.ids.forEach((id: string, index: number) => {
+        let player = players.get(parseInt(id));
+        if (player) {
+          element.team.addPlayer(player);
+          player.price = parseInt(element.prices[index]);
+
+          players.delete(parseInt(id));
+        }
+      });
+
+      teams.push(element.team)
+    });
+
+    league.players = players;
+    league.teams = teams;
+
+    return league;
+  }
+
+  public async buyPlayer(
     userToken: string,
-    leagueToken: string,
-    leagueAlias: string,
+    leagueId: number,
     playerId: number,
     teamId: number,
     price: number
   ) {
 
-    await this._webLogin(userToken, leagueToken)
+    let profile = await this._retrieveProfile(userToken);
+    let currentLeague = profile.leghe.find(
+      (league: any) => league.id === leagueId
+    );
+
+    await this._webLogin(userToken, currentLeague.token);
 
     let res = await this._httpClient.execute(
       "PUT",
-      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/salva?alias_lega=${leagueAlias}`,
+      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/salva?alias_lega=${currentLeague.alias}`,
       {
         app_key: this._webAppKey,
         "Content-Type": "application/json",
@@ -226,20 +268,24 @@ class FantasyFootball {
     return data;
   }
 
-  public async releasePlayer(    
+  public async releasePlayer(
     userToken: string,
-    leagueToken: string,
-    leagueAlias: string,
+    leagueId: number,
     playerId: number,
     teamId: number,
     releasePrice: number
   ) {
 
-    await this._webLogin(userToken, leagueToken)
+    let profile = await this._retrieveProfile(userToken);
+    let currentLeague = profile.leghe.find(
+      (league: any) => league.id === leagueId
+    );
+
+    await this._webLogin(userToken, currentLeague.token);
 
     let res = await this._httpClient.execute(
       "DELETE",
-      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/svincola?alias_lega=${leagueAlias}`,
+      `${WEB_BASE_URL}/servizi/v1_leghemercatoOrdinarioAdmin/svincola?alias_lega=${currentLeague.alias}`,
       {
         app_key: this._webAppKey,
         "Content-Type": "application/json",

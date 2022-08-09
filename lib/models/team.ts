@@ -41,4 +41,29 @@ class Team {
   }
 }
 
+class TeamPackage {
+  private _ids: Array<string>;
+  private _prices: Array<string>;
+  private _team: Team;
+
+  constructor(_ids: Array<string>, _prices: Array<string>, _team: Team) {
+    this._ids = _ids;
+    this._prices = _prices;
+    this._team = _team;
+  }
+
+  public get ids() {
+    return this._ids;
+  }
+
+  public get prices() {
+    return this._prices;
+  }
+
+  public get team() {
+    return this._team;
+  }
+}
+
 export default Team;
+export { Team, TeamPackage };

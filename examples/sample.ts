@@ -10,24 +10,26 @@ const main = async () => {
 
   let user = await client.login(conf.username, conf.password)
   console.log(user)
-  console.log(user.leagues)
 
-  let userToken = user.token
-  let leagueToken = user.leagues[0].token
-  let leagueAlias = user.leagues[0].alias
+  let leagues = await client.getLeagues(user.token)
+  console.log(leagues)
 
-  let teams = await client.getTeams(userToken, leagueToken, leagueAlias);
+  let league = await client.getLeague(user.token, leagues[0].id)
+  //console.log(league)
+
+  let roles = await client.getRolesByLeague(user.token, leagues[0].id)
+  console.log(roles)
+
   console.log(
-    util.inspect(teams, { showHidden: false, depth: null, colors: true })
+    util.inspect(league.teams, { showHidden: false, depth: null, colors: true })
   );
 
-  let playerList = await client.getPlayerList(userToken, leagueToken, leagueAlias)
-  console.log(playerList)
+  //console.log(league.players)
 
-  let result = await client.buyPlayer(userToken, leagueToken, leagueAlias, 335, 1202003, 20)
+  let result = await client.buyPlayer(user.token, leagues[0].id, 335, 1202003, 20)
   console.log(result)
   
-  result = await client.releasePlayer(userToken, leagueToken, leagueAlias, 335, 1202003, 20)
+  result = await client.releasePlayer(user.token, leagues[0].id, 335, 1202003, 20)
   console.log(result)
 
 };
