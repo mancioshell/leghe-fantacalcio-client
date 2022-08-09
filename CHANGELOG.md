@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.1](https://github.com/mancioshell/fantasy-football-client/compare/v1.5.0...v1.5.1) (2022-08-09)
+
+
+### Bug Fixes
+
+* added serialize method to model classes ([e6acf01](https://github.com/mancioshell/fantasy-football-client/commit/e6acf019215033b9defe77713d8e40ebf2cf9da4))
+
 ## [1.5.0](https://github.com/mancioshell/fantasy-football-client/compare/v1.4.0...v1.5.0) (2022-08-09)
 
 
