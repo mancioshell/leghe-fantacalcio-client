@@ -193,6 +193,22 @@ class FantasyFootball {
     return user;
   }
 
+  public async getRoleByLeagueId(userToken: string, leagueId: number): Promise<Role> {
+    let profile = await this._retrieveProfile(userToken);
+
+    let currentLeague = profile.leghe.find(
+      (league: any) => league.id === leagueId
+    );
+
+    let role = await this._retrieveUserRole(
+      userToken,
+      currentLeague.token,
+      profile.utente.username
+    );
+
+    return role
+  }
+
   public async getLeagues(userToken: string): Promise<Array<League>> {
     let profile = await this._retrieveProfile(userToken);
 
