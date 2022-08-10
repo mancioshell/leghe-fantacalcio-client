@@ -15,17 +15,14 @@ const main = async () => {
   console.log(JSON.parse(JSON.stringify(leagues)))
 
   let league = await client.getLeague(user.token, leagues[0].id)
-  console.log(JSON.parse(JSON.stringify(league)))
-
-  // let roles = await client.getRolesByLeague(user.token, leagues[0].id)
-  // console.log(JSON.parse(JSON.stringify(roles)))
+  console.log(JSON.parse(JSON.stringify(league.role)))
 
   // console.log(JSON.parse(JSON.stringify(league.teams)))
 
   // console.log(JSON.parse(JSON.stringify(league.players)))
 
-  // let result = await client.buyPlayer(user.token, leagues[0].id, 335, 1202003, 20)
-  // console.log(result)
+  let result = await client.buyPlayer(user.token, leagues[0].id, 335, 1202003, 20)
+  console.log(result)
   
   // result = await client.releasePlayer(user.token, leagues[0].id, 335, 1202003, 20)
   // console.log(result)

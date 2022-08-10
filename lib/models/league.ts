@@ -37,7 +37,7 @@ class League {
   private _name: string;
   private _token: string;
   private _alias: string;
-  private _roles: Array<Role> = new Array<Role>();
+  private _role: Role = Role.USER;
 
   private _teams: Array<Team> = new Array();
   private _players: Map<number, Player>;
@@ -92,17 +92,13 @@ class League {
     this._players = players;
   }
 
-  public get roles() {
-    return this._roles;
+  public get role() {
+    return this._role;
   }
 
-  public set roles(roles: Array<Role>) {
-    this._roles = roles;
-  }
-
-  public addRole(role: Role) {
-    this._roles.push(role);
-  }
+  public set role(role: Role) {
+    this._role = role;
+  } 
 
   public addPlayer(player: Player) {
     this._players.set(player.id, player);
@@ -118,7 +114,7 @@ class League {
       name: this._name,
       token: this._token,
       alias: this._alias,
-      roles: this._roles,
+      role: this._role,
       options: this._options,
       teams: this._teams,
       players: Object.fromEntries(this.players)

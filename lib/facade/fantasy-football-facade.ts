@@ -140,11 +140,11 @@ class FantasyFootball {
     return options;
   }
 
-  private async _retrieveUserRoles(
+  private async _retrieveUserRole(
     userToken: string,
     leagueToken: string,
     username: string
-  ): Promise<Array<Role>> {
+  ): Promise<Role> {
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
@@ -159,13 +159,12 @@ class FantasyFootball {
 
     let currentUser = data.find((elem: any) => elem.username === username);
 
-    let roles = new Array<Role>();
-    roles.push(Role.USER);
+    let role = Role.USER;
 
-    if (currentUser.adminSecondario) roles.push(Role.ADMIN);
-    if (currentUser.admin) roles.push(Role.SUPER_ADMIN);
+    if (currentUser.adminSecondario) role = Role.ADMIN;
+    if (currentUser.admin) role = Role.SUPER_ADMIN;
 
-    return roles;
+    return role;
   }
 
   public async login(username: string, password: string): Promise<User> {
@@ -199,36 +198,26 @@ class FantasyFootball {
 
     let leagues = new Array<League>();
 
-    profile.leghe.forEach((element: any) => {
+    for(let element of profile.leghe){
+
       let league = new League(
         element.id,
         element.nome,
         element.alias,
         element.token
       );
+
+      let role = await this._retrieveUserRole(
+        userToken,
+        league.token,
+        profile.utente.username
+      );
+
+      league.role = role
       leagues.push(league);
-    });
+    }
 
     return leagues;
-  }
-
-  public async getRolesByLeague(
-    userToken: string,
-    leagueId: number
-  ): Promise<Array<Role>> {
-    let profile = await this._retrieveProfile(userToken);
-
-    let leagueToken = profile.leghe.find(
-      (league: any) => league.id === leagueId
-    )?.token;
-
-    let roles = await this._retrieveUserRoles(
-      userToken,
-      leagueToken,
-      profile.utente.username
-    );
-
-    return roles;
   }
 
   public async getLeague(userToken: string, leagueId: number): Promise<League> {
@@ -244,12 +233,18 @@ class FantasyFootball {
       currentLeague.token
     );
 
-    let options = await this._retrieveLeagueOptions(userToken, league.token)
+    let options = await this._retrieveLeagueOptions(userToken, league.token);
 
     let players = await this._retrievePlayers(
       userToken,
       league.token,
       league.alias
+    );
+
+    let role = await this._retrieveUserRole(
+      userToken,
+      league.token,
+      profile.utente.username
     );
 
     let packages = await this._retrieveTeams(userToken, league.token);
@@ -271,7 +266,8 @@ class FantasyFootball {
 
     league.players = players;
     league.teams = teams;
-    league.options = options
+    league.options = options;
+    league.role = role
 
     return league;
   }
