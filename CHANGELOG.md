@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.3](https://github.com/mancioshell/fantasy-football-client/compare/v1.6.2...v1.6.3) (2022-08-10)
+
+
+### Bug Fixes
+
+* issue ([3d2c10e](https://github.com/mancioshell/fantasy-football-client/commit/3d2c10e7b527f963958086909a974658523a0580))
+
 ## [1.6.2](https://github.com/mancioshell/fantasy-football-client/compare/v1.6.1...v1.6.2) (2022-08-10)
 
 
