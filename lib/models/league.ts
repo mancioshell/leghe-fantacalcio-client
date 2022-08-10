@@ -13,23 +13,39 @@ class LeagueOptions {
   private _max_players: number;
 
   private _goalkeeper: number;
+  private _defenders: number;
+  private _midfielders: number;
+  private _strikers: number;
 
-  constructor(_credits: number, _min_players: number, _max_players: number, _goalkeeper: number) {
+  constructor(
+    _credits: number,
+    _min_players: number,
+    _max_players: number,
+    _goalkeeper: number,
+    _defenders: number,
+    _midfielders: number,
+    _strikers: number
+  ) {
     this._credits = _credits;
     this._min_players = _min_players;
     this._max_players = _max_players;
     this._goalkeeper = _goalkeeper;
+    this._defenders = _defenders;
+    this._midfielders = _midfielders;
+    this._strikers = _strikers;
   }
 
-  public toJSON(){
+  public toJSON() {
     return {
       credits: this._credits,
       min_players: this._min_players,
       max_players: this._max_players,
-      goalkeeper: this._goalkeeper
-    }
+      goalkeeper: this._goalkeeper,
+      defenders: this._defenders,
+      midfielders: this._midfielders,
+      strikers: this._strikers,
+    };
   }
-
 }
 
 class League {
@@ -42,7 +58,7 @@ class League {
   private _teams: Array<Team> = new Array();
   private _players: Map<number, Player>;
 
-  private _options: LeagueOptions = new LeagueOptions(0, 0, 0, 0)
+  private _options: LeagueOptions = new LeagueOptions(0, 0, 0, 0, 0, 0 , 0);
 
   constructor(_id: number, _name: string, _alias: string, _token: string) {
     this._id = _id;
@@ -98,7 +114,7 @@ class League {
 
   public set role(role: Role) {
     this._role = role;
-  } 
+  }
 
   public addPlayer(player: Player) {
     this._players.set(player.id, player);
@@ -107,8 +123,8 @@ class League {
   public removePlayers(player: Player) {
     this._players.delete(player.id);
   }
-  
-  public toJSON(){
+
+  public toJSON() {
     return {
       id: this._id,
       name: this._name,
@@ -117,8 +133,8 @@ class League {
       role: this._role,
       options: this._options,
       teams: this._teams,
-      players: Object.fromEntries(this.players)
-    }
+      players: Object.fromEntries(this.players),
+    };
   }
 }
 

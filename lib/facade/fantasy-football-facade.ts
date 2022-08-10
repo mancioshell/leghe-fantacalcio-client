@@ -103,7 +103,7 @@ class FantasyFootball {
           element.id,
           element.n,
           element.s,
-          element.r,
+          element.r.split(";"),
           element.ci,
           element.ca
         )
@@ -134,7 +134,10 @@ class FantasyFootball {
       leagueOptions.crediti,
       leagueOptions.min_rosa,
       leagueOptions.max_rosa,
-      leagueOptions.calciatori_ruolo.p
+      leagueOptions.calciatori_ruolo.p,
+      leagueOptions.calciatori_ruolo.d,
+      leagueOptions.calciatori_ruolo.c,
+      leagueOptions.calciatori_ruolo.a
     );
 
     return options;

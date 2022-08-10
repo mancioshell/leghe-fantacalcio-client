@@ -2,7 +2,7 @@ class Player {
   private _id: number;
   private _name: string;
   private _team: string;
-  private _role: string;
+  private _role: Array<string>;
   private _initial_quotation: number;
   private _current_quotation: number;
   private _price: number | undefined;
@@ -11,7 +11,7 @@ class Player {
     _id: number = 0,
     _name: string = "",
     _team: string = "",
-    _role: string = "",
+    _role:  Array<string> = [],
     _initial_quotation: number = 0,
     _current_quotation: number = 0
   ) {
