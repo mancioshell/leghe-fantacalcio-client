@@ -2,7 +2,7 @@ class Player {
   private _id: number;
   private _name: string;
   private _team: string;
-  private _role: Array<string>;
+  private _roles: Array<string>;
   private _initial_quotation: number;
   private _current_quotation: number;
   private _price: number | undefined;
@@ -11,14 +11,14 @@ class Player {
     _id: number = 0,
     _name: string = "",
     _team: string = "",
-    _role:  Array<string> = [],
+    _roles:  Array<string> = [],
     _initial_quotation: number = 0,
     _current_quotation: number = 0
   ) {
     this._id = _id;
     this._name = _name;
     this._team = _team;    
-    this._role = _role;
+    this._roles = _roles;
     this._initial_quotation = _initial_quotation;
     this._current_quotation = _current_quotation;
   }
@@ -31,8 +31,8 @@ class Player {
     return this._name;
   }
 
-  public get role() {
-    return this._role;
+  public get roles() {
+    return this._roles;
   }
 
   public get team() {
@@ -60,7 +60,7 @@ class Player {
       id: this._id,
       name: this._name,
       team: this._team,
-      role: this._role,
+      roles: this._roles,
       initial_quotation: this._initial_quotation,
       current_quotation: this._current_quotation
     }

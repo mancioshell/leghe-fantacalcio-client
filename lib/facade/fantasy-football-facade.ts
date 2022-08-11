@@ -68,7 +68,9 @@ class FantasyFootball {
       let idPlayerList = element.cal.split(";");
       let priceList = element.cs.split(";");
 
-      let team = new Team(element.id, element.idu, element.n);
+      let president = new User(element.idu, element.nu);
+
+      let team = new Team(element.id, element.n, president);
 
       teams.push(new TeamPackage(idPlayerList, priceList, team));
     });
@@ -170,6 +172,28 @@ class FantasyFootball {
     return role;
   }
 
+  private async _retrieveUserEmail(
+    userToken: string,
+    leagueToken: string,
+    username: string
+  ): Promise<string> {
+    let res = await this._httpClient.execute(
+      "GET",
+      `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
+      {
+        app_key: this._appKey,
+        user_token: userToken,
+        lega_token: leagueToken,
+      }
+    );
+
+    let data = JSON.parse(res.raw_body).data;
+
+    let currentUser = data.find((elem: any) => elem.username === username);
+
+    return currentUser.email;
+  }
+
   public async login(username: string, password: string): Promise<User> {
     let res = await this._httpClient.execute(
       "POST",
@@ -196,7 +220,10 @@ class FantasyFootball {
     return user;
   }
 
-  public async getRoleByLeagueId(userToken: string, leagueId: number): Promise<Role> {
+  public async getRoleByLeagueId(
+    userToken: string,
+    leagueId: number
+  ): Promise<Role> {
     let profile = await this._retrieveProfile(userToken);
 
     let currentLeague = profile.leghe.find(
@@ -209,7 +236,7 @@ class FantasyFootball {
       profile.utente.username
     );
 
-    return role
+    return role;
   }
 
   public async getLeagues(userToken: string): Promise<Array<League>> {
@@ -217,8 +244,7 @@ class FantasyFootball {
 
     let leagues = new Array<League>();
 
-    for(let element of profile.leghe){
-
+    for (let element of profile.leghe) {
       let league = new League(
         element.id,
         element.nome,
@@ -232,7 +258,7 @@ class FantasyFootball {
         profile.utente.username
       );
 
-      league.role = role
+      league.role = role;
       leagues.push(league);
     }
 
@@ -269,11 +295,19 @@ class FantasyFootball {
     let packages = await this._retrieveTeams(userToken, league.token);
     let teams = new Array<Team>();
 
-    packages.forEach((element: TeamPackage) => {
+    for (const element of packages) {
+      let email = await this._retrieveUserEmail(
+        userToken,
+        league.token,
+        element.team.president.username
+      );
+
+      element.team.president.email = email;
+
       element.ids.forEach((id: string, index: number) => {
         let player = players.get(parseInt(id));
         if (player) {
-          element.team.addPlayer(player);
+          element.team.addPlayer(player);         
           player.price = parseInt(element.prices[index]);
 
           players.delete(parseInt(id));
@@ -281,12 +315,12 @@ class FantasyFootball {
       });
 
       teams.push(element.team);
-    });
+    }
 
     league.players = players;
     league.teams = teams;
     league.options = options;
-    league.role = role
+    league.role = role;
 
     return league;
   }

@@ -1,23 +1,29 @@
 import Player from "../models/player";
+import User from "./user";
 
 class Team {
   private _id: number;
-  private _userId: number;
   private _name: string;
+
+  private _president : User
   private _players: Map<number, Player> = new Map();
 
-  constructor(_id: number = 0, _userId: number = 0, _name: string = "") {
+  constructor(_id: number,  _name: string, _president: User) {
     this._id = _id;
-    this._userId = _userId;
     this._name = _name;
+    this._president = _president;    
   }
 
   public get id() {
     return this._id;
   }
 
-  public get userId() {
-    return this._userId;
+  public get president() {
+    return this._president;
+  }
+
+  public set president(president: User) {
+    this._president = president;
   }
 
   public get name() {
@@ -43,7 +49,7 @@ class Team {
   public toJSON(){
     return {
       id: this._id,
-      userId: this._userId,
+      president: this._president,
       name: this._name,
       players: Object.fromEntries(this.players)
     }
