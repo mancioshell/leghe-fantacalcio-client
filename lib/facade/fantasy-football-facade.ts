@@ -189,9 +189,9 @@ class FantasyFootball {
 
     let data = JSON.parse(res.raw_body).data;
 
-    let currentUser = data.find((elem: any) => elem.username === username);
+    let currentUser = data.find((elem: any) => elem.username.trim() === username);
 
-    return currentUser.email;
+    return currentUser ? currentUser.email : "";
   }
 
   public async login(username: string, password: string): Promise<User> {
