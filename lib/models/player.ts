@@ -5,7 +5,7 @@ class Player {
   private _roles: Array<string>;
   private _initial_quotation: number;
   private _current_quotation: number;
-  private _price: number | undefined;
+  private _price?: number;
 
   constructor(
     _id: number = 0,
@@ -61,6 +61,7 @@ class Player {
       name: this._name,
       team: this._team,
       roles: this._roles,
+      price: this._price,
       initial_quotation: this._initial_quotation,
       current_quotation: this._current_quotation
     }
