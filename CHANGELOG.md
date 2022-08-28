@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/mancioshell/leghe-fantacalcio-client/compare/v1.0.0...v1.1.0) (2022-08-28)
+
+
+### Features
+
+* first commit ([013b9c9](https://github.com/mancioshell/leghe-fantacalcio-client/commit/013b9c91b5b3e79613d12bdb64f9b5c951b8565e))
+
 ## 1.0.0 (2022-08-28)
 
 
