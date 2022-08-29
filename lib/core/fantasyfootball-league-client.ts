@@ -1,5 +1,5 @@
-import League, { LeagueOptions, Role } from "../models/league";
-import Team, { TeamPackage } from "../models/team";
+import League, { LeagueOptions, Role } from "@models/league";
+import Team, { TeamPackage } from "@models/team";
 import Player from "@models/player";
 import HttpClient from "@utils/http-client";
 import User from "@models/user";

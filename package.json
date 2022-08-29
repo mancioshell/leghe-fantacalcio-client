@@ -7,9 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register ./examples/sample.ts",
-    "build": "tsc",
-    "prepublish": "tsc",
+    "start": "ts-node --compiler ttypescript ./examples/sample.ts",
+    "build": "ttsc",
+    "prepublish": "ttsc",
     "commit": "git-cz",
     "release": "env HUSKY_SKIP_HOOKS=1 standard-version --commit-all",
     "platform": "run-script-os",
@@ -32,8 +32,8 @@
     "run-script-os": "^1.1.6",
     "standard-version": "^9.5.0",
     "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.1.0",
-    "typescript": "^4.7.4"
+    "ttypescript": "^1.5.13",
+    "typescript-transform-paths": "^3.3.1"
   },
   "config": {
     "commitizen": {

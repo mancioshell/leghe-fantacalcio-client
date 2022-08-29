@@ -11,13 +11,13 @@ class Player {
     _id: number = 0,
     _name: string = "",
     _team: string = "",
-    _roles:  Array<string> = [],
+    _roles: Array<string> = [],
     _initial_quotation: number = 0,
     _current_quotation: number = 0
   ) {
     this._id = _id;
     this._name = _name;
-    this._team = _team;    
+    this._team = _team;
     this._roles = _roles;
     this._initial_quotation = _initial_quotation;
     this._current_quotation = _current_quotation;
@@ -37,7 +37,7 @@ class Player {
 
   public get team() {
     return this._team;
-  } 
+  }
 
   public get initialQuotation() {
     return this._initial_quotation;
@@ -52,10 +52,10 @@ class Player {
   }
 
   public set price(price: number | undefined) {
-    this._price = price
+    this._price = price;
   }
 
-  public toJSON(){
+  public toJSON() {
     return {
       id: this._id,
       name: this._name,
@@ -63,9 +63,10 @@ class Player {
       roles: this._roles,
       price: this._price,
       initial_quotation: this._initial_quotation,
-      current_quotation: this._current_quotation
-    }
+      current_quotation: this._current_quotation,
+    };
   }
 }
 
 export default Player;
+export { Player };
