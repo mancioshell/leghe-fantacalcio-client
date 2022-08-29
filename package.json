@@ -1,6 +1,6 @@
 {
   "name": "leghe-fantacalcio-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A client to interact with leghe.fantacalcio.it mobile REST API",
   "author": "Alessandro Mancini <dott.alessandro.mancini@gmail.com>",
   "license": "ISC",

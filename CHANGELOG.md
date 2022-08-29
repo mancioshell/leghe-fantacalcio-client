@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/mancioshell/leghe-fantacalcio-client/compare/v1.0.0...v1.1.0) (2022-08-29)
+
+
+### Features
+
+* first commit ([b02dbc4](https://github.com/mancioshell/leghe-fantacalcio-client/commit/b02dbc43789b76137ef86f8cdfbf0366ed881459))
+
+
+### Bug Fixes
+
+* move from tsc to ttsc to resolve alias path config ([3facdb5](https://github.com/mancioshell/leghe-fantacalcio-client/commit/3facdb54b509e7916ce0d88a194493fb2e8e9935))
+
 ## 1.0.0 (2022-08-28)
 
 
