@@ -1,0 +1,8 @@
+node_modules
+conf
+.github
+.dist
+tsconfig.json
+examples
+/lib
+.husky
