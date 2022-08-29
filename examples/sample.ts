@@ -1,7 +1,7 @@
 // @ts-ignore
 import FantasyFootballClient from "@core/fantasyfootball-league-client"
 // @ts-ignore
-import conf from "@conf/config.json";
+import conf from "../conf/config.json";
 
 const main = async () => {
   const client = new FantasyFootballClient(conf.appkey, conf.webkey);

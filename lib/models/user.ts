@@ -4,7 +4,12 @@ class User {
   private _email?: string;
   private _token?: string;
 
-  constructor(_id: number, _username: string, _email?: string, _token?: string) {
+  constructor(
+    _id: number,
+    _username: string,
+    _email?: string,
+    _token?: string
+  ) {
     this._id = _id;
     this._username = _username;
     this._email = _email;
@@ -42,3 +47,4 @@ class User {
 }
 
 export default User;
+export { User };
