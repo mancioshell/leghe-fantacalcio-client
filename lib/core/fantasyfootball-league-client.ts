@@ -151,8 +151,9 @@ class FantasyFootballLeagueClient {
   private async _retrieveUserRole(
     userToken: string,
     leagueToken: string,
-    username: string
+    id: number
   ): Promise<Role> {
+
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
@@ -164,8 +165,7 @@ class FantasyFootballLeagueClient {
     );
 
     let data = JSON.parse(res.raw_body).data;
-
-    let currentUser = data.find((elem: any) => elem.username === username);
+    let currentUser = data.find((elem: any) => elem.id === id);
 
     let role = Role.USER;
 
@@ -238,7 +238,7 @@ class FantasyFootballLeagueClient {
     let role = await this._retrieveUserRole(
       userToken,
       currentLeague.token,
-      profile.utente.username
+      profile.utente.id
     );
 
     return role;
@@ -260,7 +260,7 @@ class FantasyFootballLeagueClient {
       let role = await this._retrieveUserRole(
         userToken,
         league.token,
-        profile.utente.username
+        profile.utente.id
       );
 
       league.role = role;
@@ -294,7 +294,7 @@ class FantasyFootballLeagueClient {
     let role = await this._retrieveUserRole(
       userToken,
       league.token,
-      profile.utente.username
+      profile.utente.id
     );
 
     let packages = await this._retrieveTeams(userToken, league.token);
