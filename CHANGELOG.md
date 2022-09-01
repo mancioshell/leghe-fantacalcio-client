@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/mancioshell/leghe-fantacalcio-client/compare/v1.0.0...v1.0.1) (2022-09-01)
+
+
+### Bug Fixes
+
+* retrieve role is now done by id instead of username ([4bbd2b3](https://github.com/mancioshell/leghe-fantacalcio-client/commit/4bbd2b3d801318f4a10af67b1a60adfd7441882d))
+
 ## 1.0.0 (2022-08-29)
 
 
