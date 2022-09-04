@@ -4,7 +4,7 @@ import Team from "./team";
 enum Role {
   ADMIN = "ADMIN",
   SUPER_ADMIN = "SUPER_ADMIN",
-  USER = "USER",
+  USER = "USER"
 }
 
 class LeagueOptions {

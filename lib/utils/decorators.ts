@@ -43,14 +43,8 @@ function RetrievePlayer() {
       let leagueId = params[1];
       let playerId = params[2];
       let teamId = params[3];
+      let currentLeague = params[4];    
 
-      //@ts-ignore
-      let profile = await this._retrieveProfile(userToken);
-      let currentLeague = profile.leghe.find(
-        (league: any) => league.id === leagueId
-      );
-
-      if (!currentLeague) throw new LeagueNotFound(leagueId);
       //@ts-ignore
       await this._webLogin(userToken, currentLeague.token);
 
@@ -75,4 +69,29 @@ function RetrievePlayer() {
   };
 }
 
-export { CookiesHandler, RetrievePlayer };
+function Authorization() {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalFn = descriptor.value;
+    descriptor.value = async function (...params: any[]) {
+      let userToken = params[0];
+      let leagueId = params[1];
+
+      //@ts-ignore
+      let profile = await this._retrieveProfile(userToken);
+      let currentLeague = profile.leghe.find(
+        (league: any) => league.id === leagueId
+      );
+
+      if (!currentLeague) throw new LeagueNotFound(leagueId);
+
+      let value = await originalFn.apply(this, [...params, currentLeague]); // do operation
+      return value;
+    };
+  };
+}
+
+export { CookiesHandler, RetrievePlayer, Authorization };
