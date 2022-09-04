@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/mancioshell/leghe-fantacalcio-client/compare/v1.0.1...v1.1.0) (2022-09-04)
+
+
+### Features
+
+* added auth decorator to prevent not authorizated access ([ae42d05](https://github.com/mancioshell/leghe-fantacalcio-client/commit/ae42d0506a8734baef0a522b92a47777093315a2))
+
 ## [1.0.1](https://github.com/mancioshell/leghe-fantacalcio-client/compare/v1.0.0...v1.0.1) (2022-09-01)
 
 
