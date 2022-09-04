@@ -4,7 +4,7 @@ import Player from "@models/player";
 import HttpClient from "@utils/http-client";
 import User from "@models/user";
 
-import { RetrievePlayer } from "@utils/decorators";
+import { RetrievePlayer, Authorization } from "@utils/decorators";
 import { GenericError } from "@models/errors";
 import { FacadeResponse } from "@models/response";
 
@@ -153,7 +153,6 @@ class FantasyFootballLeagueClient {
     leagueToken: string,
     id: number
   ): Promise<Role> {
-
     let res = await this._httpClient.execute(
       "GET",
       `${APP_BASE_URL}/v1/V2_Lega/invitiAccettati`,
@@ -225,6 +224,7 @@ class FantasyFootballLeagueClient {
     return user;
   }
 
+  @Authorization()
   public async getRoleByLeagueId(
     userToken: string,
     leagueId: number
@@ -270,6 +270,7 @@ class FantasyFootballLeagueClient {
     return leagues;
   }
 
+  @Authorization()
   public async getLeague(userToken: string, leagueId: number): Promise<League> {
     let profile = await this._retrieveProfile(userToken);
 
@@ -330,6 +331,7 @@ class FantasyFootballLeagueClient {
     return league;
   }
 
+  @Authorization()
   @RetrievePlayer()
   public async buyPlayer(
     userToken: string,
@@ -340,7 +342,6 @@ class FantasyFootballLeagueClient {
     alias?: string,
     player?: Player
   ) {
-
     if (player) return new FacadeResponse().toJSON();
 
     let res = await this._httpClient.execute(
@@ -359,6 +360,7 @@ class FantasyFootballLeagueClient {
     return data;
   }
 
+  @Authorization()
   @RetrievePlayer()
   public async releasePlayer(
     userToken: string,
